@@ -14,10 +14,6 @@ class Shella < Param
   def initialize(*args)
     super
   end
-
-  def scaner
-    gets.chomp
-  end 
 =begin
   def sanitize(prompt)
     prompt.insert(0, "'")
@@ -47,7 +43,7 @@ class Shella < Param
     loop do
       get_user, get_host = userhost
       print_user(get_user, get_host)
-      tmp = scaner
+      tmp = gets.chomp
       args = prompt_methods(tmp)
       Param.check(args)
     end
