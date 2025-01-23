@@ -1,26 +1,34 @@
 #!/usr/bin/env ruby
 
 require 'open3'
-require 'rainbow'
 
 class Param
-  def self.check(array)
-    stdout, stderr, status = Open3.capture3(*array.map(&:to_s))
-    puts status.success? ? stdout : "Failed: #{stderr}"
-  end
-end
-
-class Shella < Param
-  def initialize(*args)
-    super
-  end
-=begin
-  def sanitize(prompt)
+	
+  def self.sanitize(prompt)
     prompt.insert(0, "'")
     prompt.insert(-1, "'")
     prompt
   end
-=end
+
+  def self.check(array)
+    stdout, stderr, status = Open3.capture3(*array.map(&:to_s))
+    if stdout == ""
+      command = array.map(&:to_s)
+      sanitize(command)
+      sanitized = "bash -c " << command.join
+      system(sanitized)
+    end
+    puts status.success? ? stdout : "Failed: #{stderr}"
+  end
+
+end
+
+class Shella < Param
+
+  def initialize(*args)
+    super
+  end
+
   def userhost
     username = `whoami`
     hostname = `uname -n`
