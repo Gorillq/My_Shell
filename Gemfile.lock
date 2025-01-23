@@ -1,0 +1,19 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    open3 (0.2.1)
+    rainbow (3.1.1)
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  open3
+  rainbow
+
+RUBY VERSION
+   ruby 3.3.5p100
+
+BUNDLED WITH
+   2.6.0

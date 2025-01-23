@@ -1,6 +1,7 @@
  #!/usr/bin/env ruby
 
 require 'open3'
+require 'rainbow'
 
 class Shella
   def scaner
@@ -12,18 +13,22 @@ class Shella
     prompt.insert(-1, "'")
     prompt
   end
-  def username
+  def userhost
     username = `whoami`
-    username
-  def host
-    hostname = `hostname`
-    hostname
+    hostname = `uname -n`
+    return username, hostname
+  end
+  def print_user(user, host)
+    print "[" << user.strip << "@" << host.strip << "]" << "$ "
+  end
   def check(prompt)
     stdout, stderr, status = Open3.capture3(prompt)
     puts status.success? ? stdout : "Failed"
   end
   def shell_logic
     loop do
+      get_user, get_host = userhost
+      print_user(get_user, get_host)
       tmp = scaner
       input = sanitize(tmp)
       check(input)

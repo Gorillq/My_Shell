@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 source "https://rubygems.org"
-gem 'open3'
-gem 'rainbow'
-# gem "rails"
+ruby '>= 3.3.0'
+gem 'open3', require: false
+gem 'rainbow', require: false
