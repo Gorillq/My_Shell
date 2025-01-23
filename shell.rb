@@ -12,6 +12,12 @@ class Shella
     prompt.insert(-1, "'")
     prompt
   end
+  def username
+    username = `whoami`
+    username
+  def host
+    hostname = `hostname`
+    hostname
   def check(prompt)
     stdout, stderr, status = Open3.capture3(prompt)
     puts status.success? ? stdout : "Failed"
