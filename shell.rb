@@ -12,7 +12,7 @@ end
 
 class Shella < Param
   def initialize(*args)
-    super(args)
+    super
   end
 
   def scaner
