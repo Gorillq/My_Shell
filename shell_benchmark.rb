@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
 
 require 'open3'
-module Colorize
+require 'benchmark'
 
+module Colorize
   COLOURS = {
     red: "\e[31m",
     green: "\e[32m",
@@ -20,25 +21,24 @@ module Colorize
 end
 
 class Param
-	
   def self.sanitize(prompt)
     prompt.insert(0, "'")
-    prompt.insert(-1, "'")
+    prompt.insert(prompt.size, "'")
     prompt
   end
 
   def self.cd_handle(arg)
     #change directory
     if arg.length == 2
-        Dir.chdir(arg[1])
-        puts "Changed dir to #{Dir.pwd}"
+      Dir.chdir(arg[1])
+      puts "Changed dir to #{Dir.pwd}"
     else
-        puts "Usage: cd <dir>"
+      puts "Usage: cd <dir>"
     end
-    rescue Errno::ENOENT
-      p "Directory not found: #{arg[1]}"
-    rescue Errno::EACCES
-      p "Permission denied: #{arg[1]}"
+  rescue Errno::ENOENT
+    p "Directory not found: #{arg[1]}"
+  rescue Errno::EACCES
+    p "Permission denied: #{arg[1]}"
   end
 
   def self.chdir?(arg)
@@ -50,22 +50,22 @@ class Param
       cd_handle(array)
       return
     end
+
     begin
       stdout, stderr, status = Open3.capture3(*array.map(&:to_s))
     rescue Errno::ENOENT
       p "Failed. Invalid command?"
-	    return
+      return
     else
-        if stdout == ""
-          command = array.map(&:to_s)
-            sanitize(command)
-            sanitized = "bash -c " << command.join
-            system(sanitized)
-        end
+      if stdout == ""
+        command = array.map(&:to_s)
+        sanitize(command)
+        sanitized = "bash -c " << command.join
+        system(sanitized)
       end
+    end
     puts status.success? ? stdout : "Failed: #{stderr}"
   end
-
 end
 
 class Shella < Param
@@ -86,46 +86,35 @@ class Shella < Param
     dollar = colorize(:red, "$: ")
     o_bracket = colorize(:green, "[")
     b_bracket = colorize(:green, "]")
-    print o_bracket << user << at << host << b_bracket << dollar
+    print o_bracket << user << at.strip << host << b_bracket << dollar
   end
 
   def prompt_methods(input)
     input.split.map(&:to_s)
   end
-  
-  def terminate
-    puts "Bye!"
-    Kernel.exit!(0)
-  end
-  
-  def isexit?(arg)
-    arg == "exit"
-  end
-
-  def set_home
-    Dir.chdir()
-  end
-
-  def ends(arg)
-    isexit?(arg) ? terminate : return
-  end
 
   def shell_logic
-    set_home
     loop do
       get_user, get_host = userhost
       user = colorize(:lblue, get_user)
       host = colorize(:teal, get_host)
       print_user(user, host)
       tmp = gets.chomp
-      ends(tmp)
       args = prompt_methods(tmp)
-      Param.check(args)
+
+      # Benchmark the Param.check method
+      time = Benchmark.measure do
+        Param.check(args)
+      end
+      puts "Param.check execution time: #{time.real} seconds"
     end
   end
 end
 
 if __FILE__ == $0
-  Shella.new.shell_logic
+  # Benchmark the shell_logic method
+  time = Benchmark.measure do
+    Shella.new.shell_logic
+  end
+  puts "Shella.shell_logic total execution time: #{time.real} seconds"
 end
-
