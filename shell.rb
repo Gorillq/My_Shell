@@ -27,14 +27,42 @@ class Param
     prompt
   end
 
-  def self.check(array)
-    stdout, stderr, status = Open3.capture3(*array.map(&:to_s))
-    if stdout == ""
-      command = array.map(&:to_s)
-      sanitize(command)
-      sanitized = "bash -c " << command.join
-      system(sanitized)
+  def self.cd_handle(arg)
+    #change directory
+    if arg.length == 2
+        Dir.chdir(arg[1])
+        puts "Changed dir to #{Dir.pwd}"
+    else
+        puts "Usage: cd <dir>"
     end
+    rescue Errno::ENOENT
+      p "Directory not found: #{arg[1]}"
+    rescue Errno::EACCES
+      p "Permission denied: #{arg[1]}"
+  end
+
+  def self.chdir?(arg)
+    arg[0] == "cd"
+  end
+
+  def self.check(array)
+    if chdir?(array)
+      cd_handle(array)
+      return
+    end
+    begin
+      stdout, stderr, status = Open3.capture3(*array.map(&:to_s))
+    rescue Errno::ENOENT
+      p "Failed. Invalid command?"
+	    return
+    else
+        if stdout == ""
+          command = array.map(&:to_s)
+            sanitize(command)
+            sanitized = "bash -c " << command.join
+            system(sanitized)
+        end
+      end
     puts status.success? ? stdout : "Failed: #{stderr}"
   end
 
