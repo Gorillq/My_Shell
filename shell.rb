@@ -1,6 +1,23 @@
 #!/usr/bin/env ruby
 
 require 'open3'
+module Colorize
+
+  COLOURS = {
+    red: "\e[31m",
+    green: "\e[32m",
+    yellow: "\e[33m",
+    blue: "\e[34m",
+    lblue: "\e[0;94m",
+    teal: "\e[0;96m",
+    reset: "\e[0m"
+  }
+
+  def colorize(colour, input)
+    output = "#{COLOURS[colour]}#{input}#{COLOURS[:reset]}"
+    output.strip
+  end
+end
 
 class Param
 	
@@ -24,33 +41,35 @@ class Param
 end
 
 class Shella < Param
+  include Colorize
 
   def initialize(*args)
     super
   end
 
   def userhost
-    username = `whoami`
-    hostname = `uname -n`
+    username = `whoami`.strip
+    hostname = `uname -n`.strip
     return username, hostname
   end
 
   def print_user(user, host)
-    print "[" << user.strip << "@" << host.strip << "]" << "$ "
+    at = colorize(:red, "@")
+    dollar = colorize(:red, "$: ")
+    o_bracket = colorize(:green, "[")
+    b_bracket = colorize(:green, "]")
+    print o_bracket << user << at.strip << host << b_bracket << dollar
   end
 
   def prompt_methods(input)
     input.split.map(&:to_s)
   end
-=begin
-  def prompt_methods(input)
-    input.split.map { |arg| Shellwords.escape(arg) }
-  end
-=end
   def shell_logic
     loop do
       get_user, get_host = userhost
-      print_user(get_user, get_host)
+      user = colorize(:lblue, get_user)
+      host = colorize(:teal, get_host)
+      print_user(user, host)
       tmp = gets.chomp
       args = prompt_methods(tmp)
       Param.check(args)
