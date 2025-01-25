@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
 require 'open3'
+require 'irb'
+
 module Colorize
 
   COLOURS = {
@@ -29,6 +31,7 @@ class Param
 
   def self.cd_handle(arg)
     #change directory
+#    arg = cd_helper(args)
     if arg.length == 2
         Dir.chdir(arg[1])
         puts "Changed dir to #{Dir.pwd}"
@@ -41,6 +44,15 @@ class Param
       p "Permission denied: #{arg[1]}"
   end
 
+  def self.interactive(args)
+    if args[0] == "irb"
+      puts "Entering irb"
+      IRB.start(__FILE__)
+    end
+    rescue IRB::Abort => e
+      puts "Exiting irb"
+    end
+
   def self.chdir?(arg)
     arg[0] == "cd"
   end
@@ -51,11 +63,15 @@ class Param
       return
     end
     begin
-      stdout, stderr, status = Open3.capture3(*array.map(&:to_s))
+      stdout, stderr, status = Open3.capture3(*array.map(&:to_s).reject(&:empty?))
     rescue Errno::ENOENT
       p "Failed. Invalid command?"
 	    return
+    rescue ArgumentError
+      p "Invalid arguments. Something went wrong, send patches!"
+      return
     else
+        interactive(array)
         if stdout == ""
           command = array.map(&:to_s)
             sanitize(command)
@@ -65,7 +81,6 @@ class Param
       end
     puts status.success? ? stdout : "Failed: #{stderr}"
   end
-
 end
 
 class Shella < Param
@@ -91,6 +106,7 @@ class Shella < Param
 
   def prompt_methods(input)
     input.split.map(&:to_s)
+   # input.strip.gsub(/\s+/, ' ').split.map(&:to_s).reject(&:empty?)
   end
   
   def terminate

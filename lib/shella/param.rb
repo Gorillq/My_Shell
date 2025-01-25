@@ -1,0 +1,64 @@
+require 'open3'
+require 'irb'
+
+class Param
+	
+  def self.sanitize(prompt)
+    prompt.insert(0, "'")
+    prompt.insert(-1, "'")
+    prompt
+  end
+
+  def self.cd_handle(arg)
+    #change directory
+#    arg = cd_helper(args)
+    if arg.length == 2
+        Dir.chdir(arg[1])
+        puts "Changed dir to #{Dir.pwd}"
+    else
+        puts "Usage: cd <dir>"
+    end
+    rescue Errno::ENOENT
+      p "Directory not found: #{arg[1]}"
+    rescue Errno::EACCES
+      p "Permission denied: #{arg[1]}"
+  end
+
+  def self.interactive(args)
+    if args[0] == "irb"
+      puts "Entering irb"
+      IRB.start(__FILE__)
+    end
+    rescue IRB::Abort => e
+      puts "Exiting irb"
+    end
+
+  def self.chdir?(arg)
+    arg[0] == "cd"
+  end
+
+  def self.check(array)
+    if chdir?(array)
+      cd_handle(array)
+      return
+    end
+    begin
+      stdout, stderr, status = Open3.capture3(*array.map(&:to_s).reject(&:empty?))
+    rescue Errno::ENOENT
+      p "Failed. Invalid command?"
+	    return
+    rescue ArgumentError
+      p "Invalid arguments. Something went wrong, send patches!"
+      return
+    else
+        interactive(array)
+        if stdout == ""
+          command = array.map(&:to_s)
+            sanitize(command)
+            sanitized = "bash -c " << command.join
+            system(sanitized)
+        end
+      end
+    puts status.success? ? stdout : "Failed: #{stderr}"
+  end
+end
