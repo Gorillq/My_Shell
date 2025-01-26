@@ -8,13 +8,13 @@ class Shella < Param
     super
   end
 
-  def userhost
+  private def userhost
     username = `whoami`.strip
     hostname = `uname -n`.strip
     return username, hostname
   end
 
-  def print_user(user, host)
+  private def print_user(user, host)
     at = colorize(:red, "@")
     dollar = colorize(:red, "$: ")
     o_bracket = colorize(:green, "[")
@@ -22,21 +22,21 @@ class Shella < Param
     print o_bracket << user << at << host << b_bracket << dollar
   end
 
-  def prompt_methods(input)
+  private def prompt_methods(input)
     input.split.map(&:to_s)
    # input.strip.gsub(/\s+/, ' ').split.map(&:to_s).reject(&:empty?)
   end
   
-  def terminate
+  private def terminate
     puts "Bye!"
     Kernel.exit!(0)
   end
   
-  def isexit?(arg)
+ private def isexit?(arg)
     arg == "exit"
   end
 
-  def set_home
+ private  def set_home
     Dir.chdir()
   end
 

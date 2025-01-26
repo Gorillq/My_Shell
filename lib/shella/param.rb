@@ -19,9 +19,9 @@ class Param
         puts "Usage: cd <dir>"
     end
     rescue Errno::ENOENT
-      p "Directory not found: #{arg[1]}"
+      puts "Directory not found: #{arg[1]}"
     rescue Errno::EACCES
-      p "Permission denied: #{arg[1]}"
+      puts "Permission denied: #{arg[1]}"
   end
 
   def self.interactive(args)
@@ -45,11 +45,9 @@ class Param
     begin
       stdout, stderr, status = Open3.capture3(*array.map(&:to_s).reject(&:empty?))
     rescue Errno::ENOENT
-      p "Failed. Invalid command?"
-	    return
+      puts "Failed. Invalid command?"
     rescue ArgumentError
       p "Invalid arguments. Something went wrong, send patches!"
-      return
     else
         interactive(array)
         if stdout == ""
