@@ -1,8 +1,13 @@
 require 'open3'
 require 'irb'
+require_relative 'addons'
 
 class Param
-	
+  
+  def initialize
+    @addons = Addons::Content.new
+  end
+
   def self.sanitize(prompt)
     prompt.insert(0, "'")
     prompt.insert(-1, "'")
@@ -37,10 +42,18 @@ class Param
     arg[0] == "cd"
   end
 
+  def self.addon?(arg)
+    arg[0] == "cpc"
+  end
+
   def self.check(array)
     if chdir?(array)
       cd_handle(array)
       return
+    end
+    if addon?(array)
+      @addons.fax(array[1])
+      @addons.putfax
     end
     begin
       stdout, stderr, status = Open3.capture3(*array.map(&:to_s).reject(&:empty?))

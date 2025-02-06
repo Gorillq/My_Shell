@@ -7,7 +7,6 @@ class Shella < Param
 
   def initialize(*args)
     super
-	  @addons = Addons::Content.new
   end
 
   private def userhost
