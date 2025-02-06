@@ -1,13 +1,13 @@
 require_relative 'colorize'
 require_relative 'param'
-require_relatice 'addons'
+require_relative 'addons'
 
 class Shella < Param
   include Colorize
 
   def initialize(*args)
     super
-	@addons = Addons::Content.new
+	  @addons = Addons::Content.new
   end
 
   private def userhost
