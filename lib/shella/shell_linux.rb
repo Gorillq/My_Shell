@@ -2,12 +2,14 @@ require "irb"
 require "readline"
 require "open3"
 require_relative 'colorize'
+require_relative 'addons_linux'
 
 class Shell_linux
   include Colorize
+  include Addons_linux
 
-  def sanitize(prompt)
-    prompt.insert(0, "'").insert(-1, "'")
+  def initialize
+    @clipboard = Clipboard.new
   end
 
   def cd_handle(args)
