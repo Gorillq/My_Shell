@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require_relative '../lib/shella/shella.rb'
+require_relative '../lib/shella/shell_linux.rb'
 
-Shella.new.shell_logic
+Shell_linux.new.shell_lin
