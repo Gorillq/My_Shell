@@ -1,6 +1,6 @@
 module Addons_linux
   class Clipboard
-
+    attr_reader :memo
     def initialize
       @memo = []
     end
@@ -15,6 +15,8 @@ module Addons_linux
         add(content)
       rescue Errno::ENOENT
         puts "File #{filename} not found"
+      rescue ArgumentError
+        puts "Usage: cpc <filename>"
       rescue => e
         puts "Error reading file #{e.message}"
       end

@@ -19,8 +19,10 @@ class Shell_linux
   def interactive()
     puts "Entering irb"
     IRB.start(__FILE__)
+=begin
   rescue IRB::Abort => e
     puts "Exiting irb"
+=end
   end
 
   def chdir?(args)
@@ -89,7 +91,7 @@ class Shell_linux
         puts "Failed #{stderr}"
       end
     rescue Errno::ENOENT
-      puts "Failed. Invalid command?"
+      return
     rescue ArgumentError
       puts "Something went wrong. Empty command?"
     end
@@ -102,7 +104,7 @@ class Shell_linux
       tmp = get_user_input(display)
       Readline::HISTORY.push(tmp) if !tmp.nil? && !tmp.empty?
       command = prompt_method(tmp)
-      @dispatcher.dispatch(command)
+      @dispatcher.dispatch(tmp)
       case
       when chdir?(command)
         cd_handle(command)
