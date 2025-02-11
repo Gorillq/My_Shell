@@ -2,27 +2,14 @@ require "irb"
 require "readline"
 require "open3"
 require_relative 'colorize'
-require_relative 'addons_linux'
+require_relative 'dispatch'
 
 class Shell_linux
   include Colorize
-  include Addons_linux
+  include Dispatcher
 
   def initialize
-    @clipboard = Clipboard.new
-  end
-
-  def cd_handle(args)
-    if args.length == 2
-      Dir.chdir(args[1])
-      puts "Changed dir to #{Dir.pwd}"
-    else
-      puts "Usage: cd <dir>"
-    end
-  rescue Errno::ENOENT
-    puts "Directory not found: #{args[1]}"
-  rescue Errno::EACCES
-    puts "Permission denied: #{args[1]}"
+    @dispatcher = Dispatch.new
   end
 
   def interactive?(args)
@@ -38,6 +25,19 @@ class Shell_linux
 
   def chdir?(args)
     args[0] == "cd"
+  end
+
+  def cd_handle(args)
+    if args.length == 2
+      Dir.chdir(args[1])
+      puts "Changed dir to #{Dir.pwd}"
+    else
+      puts "Usage: cd <dir>"
+    end
+  rescue Errno::ENOENT
+    puts "Directory not found: #{args[1]}"
+  rescue Errno::EACCES
+    puts "Permission denied: #{args[1]}"
   end
 
   private def userhost
@@ -102,6 +102,7 @@ class Shell_linux
       tmp = get_user_input(display)
       Readline::HISTORY.push(tmp) if !tmp.nil? && !tmp.empty?
       command = prompt_method(tmp)
+      @dispatcher.dispatch(command)
       case
       when chdir?(command)
         cd_handle(command)
