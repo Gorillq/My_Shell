@@ -23,7 +23,7 @@ module Addons_linux
     end
     
     def paste
-      @memo.first
+      print @memo.first
     end
   end
 end

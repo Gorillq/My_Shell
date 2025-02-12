@@ -28,14 +28,11 @@ module Dispatcher
     def do_cpc(args)
       #filename
       filename = args[4..-1]
-      p filename
       @clipboard.add_from_file(filename)
-      @clipboard.paste
-      p @clipboard.memo
     end
 
     def do_cvc
-      @clipboard.paste
+      print @clipboard.paste
     end
 
     def dispatch(args)
