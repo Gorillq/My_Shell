@@ -3,6 +3,7 @@ require "readline"
 require "open3"
 require_relative 'colorize'
 require_relative 'dispatch'
+require_relative 'autocompleter'
 
 class Shell_linux
   include Colorize
@@ -10,6 +11,8 @@ class Shell_linux
 
   def initialize
     @dispatcher = Dispatch.new
+    @autocomplete = Autocompleter.new
+    Readline.completion_proc = @autocomplete.completion_proc
   end
 
   def interactive?(args)
@@ -98,6 +101,12 @@ class Shell_linux
   end
 
   def shell_lin
+    trap 'SIGINT' do
+      puts "Interrupted. Exiting..."
+      print "\e[2J\e[H" # clear the screen
+      print "\e[?25h"  # show the cursor
+      terminate  #doesnt work, broken terminal after exit by ctrl_c
+    end
     set_home
     display = userhost
     loop do
