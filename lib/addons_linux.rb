@@ -26,15 +26,6 @@ module Addons_linux
       print @memo.first
     end
   end
-  class RunBenchmark
-    def initialize
-      @benchmark = BenchmarkShell.new
-    end
-    
-    def run
-      @benchmark.shell_lin
-    end
-  end
 end
 
 
