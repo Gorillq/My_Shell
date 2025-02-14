@@ -13,8 +13,8 @@ module ShellLinux
  
    def initialize
      @dispatcher = Dispatch.new
-     @autocomplete = Autocompleter.new
-     Readline.completion_proc = @autocomplete.completion_proc
+     @autocompleter = Autocompleter.new
+#     Readline.completion_proc = @autocomplete.completion_proc
    end
  
    def interactive?(args)
@@ -109,6 +109,7 @@ module ShellLinux
     set_home
     display = userhost
     loop do
+      Readline.completion_proc = @autocompleter.completion_proc(Dir.pwd)
       tmp = get_user_input(display)
       Readline::HISTORY.push(tmp) if !tmp.nil? && !tmp.empty?
       command = prompt_method(tmp)
@@ -133,14 +134,13 @@ module ShellLinux
  end
 
   class BenchmarkShell < Shell
+    def initialize
+	    super
+    end
 
-	def initialize
-	  super
-	end
-
-	def shell_lin
-	  super
-	end
+    def shell_lin
+	    super
+	  end
 
     def execute_command(command)
       start_time = Time.now
