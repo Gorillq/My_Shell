@@ -98,58 +98,58 @@ module ShellLinux
      end
    end
  
-   def shell_lin
-     trap 'SIGINT' do
-       puts "Interrupted. Exiting..."
-       print "\e[2J\e[H" # clear the screen
-       print "\e[?25h"  # show the cursor
-       print "\e[0m"
-       terminate  #doesnt work, broken terminal after exit by ctrl_c
-     end
-     set_home
-     display = userhost
-     loop do
-       tmp = get_user_input(display)
-       Readline::HISTORY.push(tmp) if !tmp.nil? && !tmp.empty?
-       command = prompt_method(tmp)
-       @dispatcher.dispatch(tmp)
-       case
-       when chdir?(command)
-         cd_handle(command)
-       when interactive?(command)
-         interactive
-       when terminate?(command)
-         terminate
-       else
-         check(command)
-       end
-     end
-   end
+  def shell_lin
+    trap 'SIGINT' do
+      puts "Interrupted. Exiting..."
+      print "\e[2J\e[H" # clear the screen
+      print "\e[?25h"  # show the cursor
+      print "\e[0m"
+      terminate
+    end
+    set_home
+    display = userhost
+    loop do
+      tmp = get_user_input(display)
+      Readline::HISTORY.push(tmp) if !tmp.nil? && !tmp.empty?
+      command = prompt_method(tmp)
+      @dispatcher.dispatch(tmp)
+      execute_command(command)
+      break if terminate?(command)
+    end
+  end
+
+  def execute_command(command)
+    case
+    when chdir?(command)
+      cd_handle(command)
+    when interactive?(command)
+      interactive
+    when terminate?(command)
+      terminate
+    else
+      check(command)
+    end
+  end
  end
+
   class BenchmarkShell < Shell
-    def initialize
-      super
-      @benchmark_results = {}
-    end
 
-    def shell_lin
-      puts "Starting benchmark session..."
-      super
-      puts "Benchmark session ended. Results:"
-      @benchmark_results.each do |cmd, time|
-        puts "#{cmd}: #{time} seconds"
-      end
-    end
+	def initialize
+	  super
+	end
 
-    def check(command)
+	def shell_lin
+	  super
+	end
+
+    def execute_command(command)
       start_time = Time.now
       super(command)
       end_time = Time.now
-      @benchmark_results[command.join(" ")] = end_time - start_time
+      elapsed_time = end_time - start_time
+      puts "Benchmark for #{command.join(' ')}: #{elapsed_time} seconds"
     end
-    # other methods
   end
 end
- 
     
     
