@@ -1,4 +1,5 @@
 require_relative 'addons_linux'
+require_relative 'shell_linux'
 module Dispatcher
   class Dispatch
     include Addons_linux
@@ -7,14 +8,6 @@ module Dispatcher
 
     def initialize
       @clipboard = Clipboard.new
-=begin
-      @commands = {
-        #copy content
-        'cpc' => method(:copy_content),
-        #paste content
-        'cpv' => @clipboard.method(:paste)
-      }
-=end
     end
 
     def copy_content(filename)
@@ -43,6 +36,8 @@ module Dispatcher
       elsif cmd == 'cvc'
         do_cvc
         return
+      elsif cmd == 'ben'
+        ShellLinux::BenchmarkShell.new.shell_lin
       end
     end
     end
